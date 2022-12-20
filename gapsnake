@@ -1,0 +1,30 @@
+#!/bin/bash
+
+version=0.1.0
+
+
+curdir=$(pwd)
+path=$(readlink -f "$0")
+dir=$(dirname "$path")
+
+usage()
+{
+    echo "TODO: Write usage info!"
+
+}
+
+
+if   [ "$1" == "test" ]; then
+    $dir/src/test.sh
+    
+elif   [ "$1" == "init" ]; then
+    cp $dir/templates/config.yaml $curdir/config.yaml
+    Rscript $dir/scripts/init_sample_table.R $2
+
+elif   [ "$1" == "recon" ]; then
+    shift
+    snakemake -s $dir/workflows/recon.smk "$@" --cores 16
+    
+else
+    usage
+fi
