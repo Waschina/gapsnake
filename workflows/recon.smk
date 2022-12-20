@@ -66,7 +66,6 @@ rule gapseq_find_transport:
         "logs/transport/{sample}.log"
     shell:
         """
-        mkdir -p {wildcards.sample}
         gapseq find-transport -b 200 -K {threads} {input} > {log}
         gzip {wildcards.sample}-Transporter.tbl
         mv {wildcards.sample}-Transporter.tbl.gz {output}
