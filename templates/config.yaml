@@ -18,8 +18,10 @@ transport_time: 1 # hours
 # Parameter "gapseq draft"  #
 #---------------------------#
 draft_threads: 1
-draft_mem: 1 # Gb
+draft_mem: 3 # Gb
 draft_time: 1 # hours
+draft_u: 200
+draft_l: 100
 
 #---------------------------#
 # Parameter "gapseq medium" #

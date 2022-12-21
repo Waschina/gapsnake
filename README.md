@@ -35,6 +35,18 @@ cookiecutter --output-dir ~/.config/snakemake https://github.com/metagenome-atla
 
 Local machine
 
+```R
+# The Setup
+cd /path/to/project/directory # Usually one dir up from where your genomes are
+conda activate gapsnake
+export PATH="${PATH}:/path/to/gapsnake/"
+
+# Initialize gapsnake run
+gapsnake init genomes/ # or instead of "genomes/" any path the place where your genomes are
+
+
+```
+
 
 
 Cluster execution
