@@ -47,9 +47,9 @@ rule gapseq_find:
     shell:
         """
         gapseq find -p all -b {params.b} -t {params.taxonomy} -m {params.taxonomy} -K {threads} -O {input} > {log}
-        gzip {wildcards.sample}-all-Reactions.tbl
+        gzip -f {wildcards.sample}-all-Reactions.tbl
         mv {wildcards.sample}-all-Reactions.tbl.gz {output.rxn}
-        gzip {wildcards.sample}-all-Pathways.tbl
+        gzip -f {wildcards.sample}-all-Pathways.tbl
         mv {wildcards.sample}-all-Pathways.tbl.gz {output.pwy}
         """
         
@@ -67,7 +67,7 @@ rule gapseq_find_transport:
     shell:
         """
         gapseq find-transport -b 200 -K {threads} {input} > {log}
-        gzip {wildcards.sample}-Transporter.tbl
+        gzip -f {wildcards.sample}-Transporter.tbl
         mv {wildcards.sample}-Transporter.tbl.gz {output}
         """
         
@@ -98,7 +98,7 @@ rule gapseq_draft:
         mv {wildcards.sample}-draft.RDS {output.draft}
         mv {wildcards.sample}-rxnWeights.RDS {output.rxnWeights}
         mv {wildcards.sample}-rxnXgenes.RDS {output.rxnXgenes}
-        gzip {wildcards.sample}-draft.xml
+        gzip -f {wildcards.sample}-draft.xml
         mv {wildcards.sample}-draft.xml.gz {output.xml}
         """
         
@@ -144,7 +144,7 @@ rule gapseq_fill:
         fi
         
         mv {wildcards.sample}.RDS {output.model}
-        gzip {wildcards.sample}.xml
+        gzip -f {wildcards.sample}.xml
         mv {wildcards.sample}.xml.gz {output.xml}
-        
         """
+
