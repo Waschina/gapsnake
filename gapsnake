@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version=0.1.0
+version=0.1.1
 
 
 curdir=$(pwd)
@@ -15,15 +15,15 @@ usage()
 
 
 if   [ "$1" == "test" ]; then
-    $dir/src/test.sh
+    $dir/src/test.sh # TODO
     
 elif   [ "$1" == "init" ]; then
-    cp $dir/templates/config.yaml $curdir/config.yaml
-    Rscript $dir/scripts/init_sample_table.R $2
+    cp $dir/config/config.yaml $curdir/config.yaml
+    Rscript $dir/workflow/scripts/init_sample_table.R $2
 
 elif   [ "$1" == "recon" ]; then
     shift
-    snakemake -s $dir/workflows/recon.smk "$@" --cores 16
+    snakemake -s $dir/workflow/rules/recon.smk "$@" --cores 16
     
 else
     usage

@@ -1,4 +1,11 @@
 
+#---------------------------------#
+# Gene prediction (via pyrodigal) #
+#---------------------------------#
+translate_cds: False
+translate_mem: 1 # Gb
+translate_time: 1 # hours
+
 #--------------------------#
 # Parameters "gapseq find" #
 #--------------------------#

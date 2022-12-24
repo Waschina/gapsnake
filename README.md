@@ -16,7 +16,7 @@ git clone https://github.com/Waschina/gapsnake
 cd gapsnake
 
 # Create and activate a conda environment "gapsnake"
-conda env create -n gapsnake --file gapsnake_env.yml
+conda env create -n gapsnake --file gapsnake_env.yaml
 conda activate gapsnake
 ```
 

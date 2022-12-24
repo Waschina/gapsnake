@@ -5,15 +5,21 @@ configfile: "config.yaml"
 sampleTable = pd.read_csv("samples.tsv", index_col="sample", sep="\t")
 SAMPLES = sampleTable.index.values
 
-def get_genome(wildcards):
+def get_genome_nucl(wildcards):
     return sampleTable.at[wildcards.sample, 'genome_file']
-    
+
+def get_genome(wildcards):
+    if config.get("translate_cds", 1):
+        return 'genomes_prot/'+wildcards.sample+'.faa.gz'
+    else:
+        return get_genome_nucl(wildcards)
+
 def get_taxonomy(wildcards):
     return sampleTable.at[wildcards.sample, 'taxonomy']
-    
+
 def get_biomass(wildcards):
     return sampleTable.at[wildcards.sample, 'biomass']
-    
+
 def get_medium(wildcards):
     return sampleTable.at[wildcards.sample, 'medium']
 
@@ -28,6 +34,22 @@ rule all:
         expand("models/{sample}/{sample}.RDS", sample=SAMPLES),
     output:
         touch("finished_recon")
+
+
+rule pyrodigal:
+    input:
+        genome=get_genome_nucl
+    output:
+        prot="genomes_prot/{sample}.faa.gz"
+    threads: 1
+    resources:
+        mem=config.get("translate_mem", 1),
+        time=config.get("translate_time", 1)
+    conda:
+        "../envs/pyrodigal.yaml"
+    script:
+        "../scripts/pyrodigal_predict.py"
+
 
 rule gapseq_find:
     input:
@@ -138,9 +160,9 @@ rule gapseq_fill:
     shell:
         """
         if grep -q cpd11640 "{input.medium}"; then
-	    gapseq fill -m {input.draft} -n {input.medium} -c {input.rxnWeights} -g {input.rxnXgenes} -b {params.b} -e highH2 > {log}
-	else
- 	    gapseq fill -m {input.draft} -n {input.medium} -c {input.rxnWeights} -g {input.rxnXgenes} -b {params.b} > {log}
+            gapseq fill -m {input.draft} -n {input.medium} -c {input.rxnWeights} -g {input.rxnXgenes} -b {params.b} -e highH2 > {log}
+        else
+             gapseq fill -m {input.draft} -n {input.medium} -c {input.rxnWeights} -g {input.rxnXgenes} -b {params.b} > {log}
         fi
         
         mv {wildcards.sample}.RDS {output.model}

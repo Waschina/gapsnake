@@ -1,0 +1,10 @@
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - snakemake-minimal >= 7.18.1
+  - cookiecutter
+  - pandas
+  - mamba
+
