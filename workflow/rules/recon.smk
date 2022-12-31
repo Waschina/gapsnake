@@ -68,7 +68,7 @@ rule gapseq_find:
         "logs/find/{sample}.log"
     shell:
         """
-        gapseq find -p all -b {params.b} -t {params.taxonomy} -m {params.taxonomy} -K {threads} -O -f models/{wildcards.sample} {input} > {log}
+        gapseq find -p all -b {params.b} -t {params.taxonomy} -m {params.taxonomy} -K {threads} -v 0 -O -f models/{wildcards.sample} {input} > {log}
         gzip -f models/{wildcards.sample}/{wildcards.sample}-all-Reactions.tbl
         gzip -f models/{wildcards.sample}/{wildcards.sample}-all-Pathways.tbl
         """
@@ -86,7 +86,7 @@ rule gapseq_find_transport:
         "logs/transport/{sample}.log"
     shell:
         """
-        gapseq find-transport -b 200 -K {threads} -f models/{wildcards.sample} {input} > {log}
+        gapseq find-transport -b 200 -K {threads} -v 0 -f models/{wildcards.sample} {input} > {log}
         gzip -f models/{wildcards.sample}/{wildcards.sample}-Transporter.tbl
         """
         
