@@ -23,7 +23,7 @@ elif   [ "$1" == "init" ]; then
 
 elif   [ "$1" == "recon" ]; then
     shift
-    snakemake -s $dir/workflow/rules/recon.smk "$@" --cores 16 --use-conda
+    snakemake -s $dir/workflow/rules/recon.smk "$@" --cores 16 --use-conda --rerun-triggers mtime --scheduler greedy --rerun-incomplete
     
 else
     usage
