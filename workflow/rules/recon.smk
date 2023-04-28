@@ -129,7 +129,12 @@ rule gapseq_medium:
         "logs/medium/{sample}.log"
     shell:
         """
-        gapseq medium -m {input.model} -p {input.pwy} -c {params.c} -f models/{wildcards.sample} > {log}
+        par_c={param.c}
+        if [ -n "$par_c" ]; then
+            gapseq medium -m {input.model} -p {input.pwy} -c {params.c} -f models/{wildcards.sample} > {log}
+        else
+            gapseq medium -m {input.model} -p {input.pwy} -f models/{wildcards.sample} > {log}
+        fi
         """
         
 rule gapseq_fill:
