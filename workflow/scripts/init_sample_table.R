@@ -15,12 +15,15 @@ if(!dir.exists(args[1]))
 
 valid_extensions <- "\\.fasta$|\\.fasta\\.gz$|\\.fna$|\\.fna\\.gz$|\\.faa$|\\.faa\\.gz$|\\.fa$|\\.fa\\.gz$|\\.fn$|\\.fn\\.gz$"
 
-genomes <- dir(args[1], pattern = valid_extensions)
+genomes <- dir(args[1], pattern = valid_extensions, recursive = TRUE)
 
-dt <- data.table(sample = gsub(valid_extensions,"", genomes),
+dt <- data.table(sample = basename(gsub(valid_extensions,"", genomes)),
                  genome_file = paste0(args[1],"/",genomes),
                  taxonomy = "auto",
                  biomass = "auto")
 dt[, medium := paste0("models/",sample,"/",sample,"-medium.csv")]
+
+if(any(duplicated(dt$sample)))
+  stop("Sample names not unique. There are genome files in different sub-directories with the same basename...")
 
 fwrite(dt, "samples.tsv", sep = "\t", quote = FALSE)
