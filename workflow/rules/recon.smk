@@ -129,7 +129,7 @@ rule gapseq_medium:
         "logs/medium/{sample}.log"
     shell:
         """
-        par_c={param.c}
+        par_c={params.c}
         if [ -n "$par_c" ]; then
             gapseq medium -m {input.model} -p {input.pwy} -c {params.c} -f models/{wildcards.sample} > {log}
         else
