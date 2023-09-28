@@ -3,7 +3,7 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - pyrodigal
+  - pyrodigal>=3.0.0
   - biopython
   - xopen
 

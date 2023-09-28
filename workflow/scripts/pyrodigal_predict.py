@@ -14,7 +14,7 @@ with xopen(genome, mode='r') as f:
         sequences.append(str(record.seq))
 
 # train pyrodigal
-orf_finder = pyrodigal.OrfFinder(closed=False)
+orf_finder = pyrodigal.GeneFinder(closed=False)
 orf_finder.train(*sequences, translation_table=11)
 
 # predict genes
