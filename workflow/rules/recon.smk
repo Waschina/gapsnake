@@ -43,7 +43,7 @@ rule pyrodigal:
         prot="genomes_prot/{sample}.faa.gz"
     threads: 1
     resources:
-        mem=config.get("translate_mem", 1),
+        mem_mb=config.get("translate_mem", 1) * 1000,
         time=config.get("translate_time", 1)
     conda:
         "../envs/pyrodigal.yaml"
@@ -62,7 +62,7 @@ rule gapseq_find:
         pwy="models/{sample}/{sample}-all-Pathways.tbl.gz"
     threads: config.get("find_threads", 1)
     resources:
-        mem=config.get("find_mem", 1),
+        mem_mb=config.get("find_mem", 1) * 1000,
         time=config.get("find_time", 1)
     log:
         "logs/find/{sample}.log"
@@ -80,7 +80,7 @@ rule gapseq_find_transport:
         "models/{sample}/{sample}-Transporter.tbl.gz"
     threads: config.get("transport_threads", 1)
     resources:
-        mem=config.get("transport_mem", 1),
+        mem_mb=config.get("transport_mem", 1) * 1000,
         time=config.get("transport_time", 1)
     log:
         "logs/transport/{sample}.log"
@@ -107,7 +107,7 @@ rule gapseq_draft:
         xml="models/{sample}/{sample}-draft.xml.gz"
     threads: config.get("draft_threads", 1)
     resources:
-        mem=config.get("draft_mem", 1),
+        mem_mb=config.get("draft_mem", 1) * 1000,
         time=config.get("draft_time", 1)
     log:
         "logs/draft/{sample}.log"
@@ -144,22 +144,23 @@ rule gapseq_fill:
         rxnWeights="models/{sample}/{sample}-rxnWeights.RDS",
         rxnXgenes="models/{sample}/{sample}-rxnXgenes.RDS"
     params:
-        b=config.get("fill_b", 1)
+        b=config.get("fill_b", 1),
+        mingr=config.get("fill_mingr", 1)
     output:
         model="models/{sample}/{sample}.RDS",
         xml="models/{sample}/{sample}.xml.gz"
     threads: config.get("fill_threads", 1)
     resources:
-        mem=config.get("fill_mem", 1),
+        mem_mb=config.get("fill_mem", 1) * 1000,
         time=config.get("fill_time", 1)
     log:
         "logs/fill/{sample}.log"
     shell:
         """
         if grep -q cpd11640 "{input.medium}"; then
-            gapseq fill -m {input.draft} -n {input.medium} -c {input.rxnWeights} -g {input.rxnXgenes} -b {params.b} -e highH2 -f models/{wildcards.sample} > {log}
+            gapseq fill -m {input.draft} -n {input.medium} -c {input.rxnWeights} -g {input.rxnXgenes} -b {params.b} -e highH2 -f models/{wildcards.sample} -k {params.mingr} > {log}
         else
-             gapseq fill -m {input.draft} -n {input.medium} -c {input.rxnWeights} -g {input.rxnXgenes} -b {params.b} -f models/{wildcards.sample} > {log}
+             gapseq fill -m {input.draft} -n {input.medium} -c {input.rxnWeights} -g {input.rxnXgenes} -b {params.b} -f models/{wildcards.sample} -k {params.mingr} > {log}
         fi
         
         gzip -f models/{wildcards.sample}/{wildcards.sample}.xml
