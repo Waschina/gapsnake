@@ -6,6 +6,7 @@ from xopen import xopen
 import gzip
 
 genome = snakemake.input.genome
+translation_table = int(snakemake.params.translation_table)
 
 # read contigs
 sequences = []
@@ -15,7 +16,7 @@ with xopen(genome, mode='r') as f:
 
 # train pyrodigal
 orf_finder = pyrodigal.GeneFinder(closed=False)
-orf_finder.train(*sequences, translation_table=11)
+orf_finder.train(*sequences, translation_table=translation_table)
 
 # predict genes
 f_faa = open(os.path.splitext(re.sub('\\.gz$','',genome))[0]+'.faa', 'w+')
