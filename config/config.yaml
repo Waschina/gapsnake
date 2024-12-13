@@ -15,9 +15,9 @@ translate_time: 1 # hours
 # Parameters "gapseq find"             #
 # also used for "gapseq find-transport #
 #--------------------------------------#
-find_batch_size: 8 # How many genomes are processed per job?
-find_threads: 16
-find_mem: 2 # Gb
+find_batch_size: 12 # How many genomes are processed per job?
+find_threads: 12
+find_mem: 8 # Gb
 find_time: 12 # hours
 find_b: 200 # bitscore cutoff
 
