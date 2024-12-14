@@ -159,9 +159,10 @@ rule gapseq_find:
         rxnf=({params.rxnfiles})
         pwyf=({params.pwyfiles})
         trsf=({params.trsfiles})
+        idsall=(`seq 0 $((${#genomes[@]} -1))`)
         
         # finally parallel processing of remaining samples
-        parallel --jobs {threads} gsfind ::: $(seq 0 $((${{#genomes[@]}} - 1))) > {log}
+        parallel --jobs {threads} gsfind ::: ${idsall[@]}  > {log}
         
         # check if everything is there
         splids=({params.splids})
