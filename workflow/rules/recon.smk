@@ -120,7 +120,7 @@ rule gapseq_find:
             # Reactions and Pathways
             date > logs/find/$spl.log
             echo "Starting reaction and pathway prediction\n" >> logs/find/$spl.log
-            $gapseq find -p all -b {params.b} -t $tax -m $tax -K $ncores -v 0 -O -f models/$spl $geno >> logs/find/$spl.log 
+            $gapseq find -p {params.searchterm} -b {params.b} -t $tax -m $tax -K $ncores -v 0 -O -f models/$spl $geno >> logs/find/$spl.log 
             
             # Transporters
             date >> logs/find/$spl.log
