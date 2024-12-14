@@ -107,16 +107,17 @@ rule gapseq_find:
     threads: config.get("find_threads", 1)
     resources:
         mem_mb=config.get("find_mem", 1) * 1000,
-        time=config.get("find_time", 1)
-    log: "logs/find/group_{group}.log"
+        time=config.get("find_time", 1),
+        attempt=lambda wildcards, attempt: '_{}.log'.format(attempt)
+    log: "logs/find/find_group_{group}"
     benchmark: "benchmark/find/group_{group}.tsv"
     shell:
         """
         mkdir -p models
-        echo "Starting find group {wildcards.group}" > {log}
+        echo "Starting find group {wildcards.group}" > {log}{resources.attempt}
         if [ {params.copygapseqdir} == "True" ]; then
-            rsync -av -q --exclude=".*" {params.gapseqdir} {resources.tmpdir}/gapsnake_{wildcards.group} >> {log}
-            echo "{resources.tmpdir}/{wildcards.group}" >> {log}
+            rsync -av -q --exclude=".*" {params.gapseqdir} {resources.tmpdir}/gapsnake_{wildcards.group} >> {log}{resources.attempt}
+            echo "{resources.tmpdir}/{wildcards.group}" >> {log}{resources.attempt}
         fi
         
         gsfind() {{            
@@ -136,7 +137,7 @@ rule gapseq_find:
             spl=${{splids[$idx]}}
             
             (( ncores=({threads}+3-1)/3 ));
-            
+            # TODO dynamic ncores calculation depending on the number of threads per reconstructions
             mkdir -p models/$spl
             
             # Reactions and Pathways
@@ -159,27 +160,28 @@ rule gapseq_find:
         
         genomes=({input.genomes})
         
-        # TODO: check if really all samples still need to be processed, if not, give only indices that still need to be done to GNU parallel
+        # check if really all samples still need to be processed, if not, give only indices that still need to be done to GNU parallel
         rxnf=({params.rxnfiles})
         pwyf=({params.pwyfiles})
         trsf=({params.trsfiles})
+        spls=({params.splids})
         idsall=(`seq 0 $((${{#genomes[@]}} -1))`)
         idstodo=()
         
         for i in "${{!idsall[@]}}"; do
-            if [[ ! -e "${{rxnf[i]}}" || ! -e "${{pwyf[i]}}" || ! -e "${{trsf[i]}}" ]]; then
+            if [[ ! -d "models/${{spls[i]}}" || ! -e "${{rxnf[i]}}" || ! -e "${{pwyf[i]}}" || ! -e "${{trsf[i]}}" ]]; then
                 idstodo+=("${{idsall[i]}}")
             fi
         done
         
         k=${{#idstodo[@]}}
         n=${{#idsall[@]}}
-        echo "Remaining genomes in group({wildcards.group}): $k / $n" >> {log}
+        echo "Remaining genomes in group({wildcards.group}): $k / $n" >> {log}{resources.attempt}
         
         # finally parallel processing of remaining samples
         nthreads={threads}
         njobs=$(( nthreads < k ? nthreads : k ))
-        parallel --env njobs --jobs $njobs gsfind ::: ${{idstodo[@]}}  >> {log}
+        parallel --env njobs --jobs $njobs gsfind ::: ${{idstodo[@]}}  >> {log}{resources.attempt}
         
         # check if everything is there
         splids=({params.splids})
