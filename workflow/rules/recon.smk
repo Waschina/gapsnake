@@ -156,7 +156,11 @@ rule gapseq_find:
         genomes=({input.genomes})
         
         # TODO: check if really all samples still need to be processed, if not, give only indices that still need to be done to GNU parallel
+        rxnf=({params.rxnfiles})
+        pwyf=({params.pwyfiles})
+        trsf=({params.trsfiles})
         
+        # finally parallel processing of remaining samples
         parallel --jobs {threads} gsfind ::: $(seq 0 $((${{#genomes[@]}} - 1))) > {log}
         
         # check if everything is there
