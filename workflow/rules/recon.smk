@@ -12,6 +12,11 @@ if config.get("translate_cds", 1):
 else:
     sampleTable['genome_use'] = sampleTable['genome_file']
 
+# define final gapseq files
+sampleTable['rxn_file'] = "models/" + SAMPLES + "/" + SAMPLES + "-" + config.get("params.searchterm", 1) + "-Reactions.tbl.gz"
+sampleTable['pwy_file'] = "models/" + SAMPLES + "/" + SAMPLES + "-" + config.get("params.searchterm", 1) + "-Pathways.tbl.gz"
+sampleTable['trs_file'] = "models/" + SAMPLES + "/" + SAMPLES + "-Transporter.tbl.gz"
+
 # assign groups for bundle processing
 sampleTable['Group'] = list(pd.Series(range(len(sampleTable))) // int(config.get("find_batch_size", 1)))
 ngroups=int(np.ceil(len(sampleTable) / int(config.get("find_batch_size", 1))))
@@ -48,6 +53,16 @@ def get_translation_table(wildcards):
 def get_group_file(wildcards):
     return "group_" + str(sampleTable.at[wildcards.sample, 'Group']) + ".txt"
 
+def get_rxn_file_bygroup(wildcards):
+    return " ".join(sampleTable[sampleTable['Group'] == int(wildcards.group)]['rxn_file'])
+
+def get_pwy_file_bygroup(wildcards):
+    return " ".join(sampleTable[sampleTable['Group'] == int(wildcards.group)]['pwy_file'])
+
+def get_trs_file_bygroup(wildcards):
+    return " ".join(sampleTable[sampleTable['Group'] == int(wildcards.group)]['trs_file'])
+
+
 
 # Rules
 
@@ -83,6 +98,9 @@ rule gapseq_find:
         b=config.get("find_b", 1),
         splids=get_sample_bygroup,
         taxonomy=get_taxonomy_bygroup,
+        rxnfiles=get_rxn_file_bygroup,
+        pwyfiles=get_pwy_file_bygroup,
+        trsfiles=get_trs_file_bygroup,
         gapseqdir=config.get("gapseq_dir",1),
         copygapseqdir=config.get("copy_gapseq_dir", 1),
         searchterm=config.get("search_term", 1)
@@ -136,6 +154,8 @@ rule gapseq_find:
         export -f gsfind
         
         genomes=({input.genomes})
+        
+        # TODO: check if really all samples still need to be processed, if not, give only indices that still need to be done to GNU parallel
         
         parallel --jobs {threads} gsfind ::: $(seq 0 $((${{#genomes[@]}} - 1))) > {log}
         
