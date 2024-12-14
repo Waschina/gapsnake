@@ -84,7 +84,8 @@ rule gapseq_find:
         splids=get_sample_bygroup,
         taxonomy=get_taxonomy_bygroup,
         gapseqdir=config.get("gapseq_dir",1),
-        copygapseqdir=config.get("copy_gapseq_dir", 1)
+        copygapseqdir=config.get("copy_gapseq_dir", 1),
+        searchterm=config.get("search_term", 1)
     threads: config.get("find_threads", 1)
     resources:
         mem_mb=config.get("find_mem", 1) * 1000,
@@ -99,7 +100,7 @@ rule gapseq_find:
         fi
         
         gsfind() {{
-            # redirect gapseq if gaoseq dir is copies to tmp-dir
+            # redirect gapseq if gapseq dir is copied to tmp-dir
             if [ {params.copygapseqdir} == "True" ]; then
                 gapseq="{resources.tmpdir}/gapsnake_{wildcards.group}/gapseq/./gapseq"
             else
@@ -136,7 +137,7 @@ rule gapseq_find:
         
         genomes=({input.genomes})
         
-        parallel --jobs {threads} gsfind ::: $(seq 0 $((${{#genomes[@]}} - 1))) >> {log}
+        parallel --jobs {threads} gsfind ::: $(seq 0 $((${{#genomes[@]}} - 1))) > {log}
         
         # check if everything is there
         splids=({params.splids})
@@ -145,8 +146,8 @@ rule gapseq_find:
         for sample in "${{splids[@]}}"; do
             # Define the required file paths
             files=(
-                "models/${{sample}}/${{sample}}-all-Reactions.tbl.gz"
-                "models/${{sample}}/${{sample}}-all-Pathways.tbl.gz"
+                "models/${{sample}}/${{sample}}-{params.searchterm}-Reactions.tbl.gz"
+                "models/${{sample}}/${{sample}}-{params.searchterm}-Pathways.tbl.gz"
                 "models/${{sample}}/${{sample}}-Transporter.tbl.gz"
             )
     

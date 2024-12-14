@@ -3,6 +3,7 @@
 #-----------------#
 gapseq_dir: <gapseq_dir>
 copy_gapseq_dir: False
+search_term: all
 
 #---------------------------------#
 # Gene prediction (via pyrodigal) #
