@@ -13,8 +13,8 @@ else:
     sampleTable['genome_use'] = sampleTable['genome_file']
 
 # define final gapseq files
-sampleTable['rxn_file'] = "models/" + SAMPLES + "/" + SAMPLES + "-" + config.get("params.searchterm", 1) + "-Reactions.tbl.gz"
-sampleTable['pwy_file'] = "models/" + SAMPLES + "/" + SAMPLES + "-" + config.get("params.searchterm", 1) + "-Pathways.tbl.gz"
+sampleTable['rxn_file'] = "models/" + SAMPLES + "/" + SAMPLES + "-" + config.get("search_term", 1) + "-Reactions.tbl.gz"
+sampleTable['pwy_file'] = "models/" + SAMPLES + "/" + SAMPLES + "-" + config.get("search_term", 1) + "-Pathways.tbl.gz"
 sampleTable['trs_file'] = "models/" + SAMPLES + "/" + SAMPLES + "-Transporter.tbl.gz"
 
 # assign groups for bundle processing
@@ -112,12 +112,14 @@ rule gapseq_find:
     benchmark: "benchmark/find/group_{group}.tsv"
     shell:
         """
+        mkdir -p models
+        echo "Starting find group {wildcards.group}" > {log}
         if [ {params.copygapseqdir} == "True" ]; then
-            rsync -av -q --exclude=".*" {params.gapseqdir} {resources.tmpdir}/gapsnake_{wildcards.group} > {log}
+            rsync -av -q --exclude=".*" {params.gapseqdir} {resources.tmpdir}/gapsnake_{wildcards.group} >> {log}
             echo "{resources.tmpdir}/{wildcards.group}" >> {log}
         fi
         
-        gsfind() {{
+        gsfind() {{            
             # redirect gapseq if gapseq dir is copied to tmp-dir
             if [ {params.copygapseqdir} == "True" ]; then
                 gapseq="{resources.tmpdir}/gapsnake_{wildcards.group}/gapseq/./gapseq"
@@ -134,6 +136,8 @@ rule gapseq_find:
             spl=${{splids[$idx]}}
             
             (( ncores=({threads}+3-1)/3 ));
+            
+            mkdir -p models/$spl
             
             # Reactions and Pathways
             date > logs/find/$spl.log
@@ -164,18 +168,18 @@ rule gapseq_find:
         
         for i in "${{!idsall[@]}}"; do
             if [[ ! -e "${{rxnf[i]}}" || ! -e "${{pwyf[i]}}" || ! -e "${{trsf[i]}}" ]]; then
-                idstodo+=("{{idsall[i]}}")
+                idstodo+=("${{idsall[i]}}")
             fi
         done
         
         k=${{#idstodo[@]}}
         n=${{#idsall[@]}}
-        echo "Remaining genomes in group({wildcards.group}): $k / $n"
+        echo "Remaining genomes in group({wildcards.group}): $k / $n" >> {log}
         
         # finally parallel processing of remaining samples
         nthreads={threads}
         njobs=$(( nthreads < k ? nthreads : k ))
-        parallel --env njobs --jobs $njobs gsfind ::: ${{idstodo[@]}}  > {log}
+        parallel --env njobs --jobs $njobs gsfind ::: ${{idstodo[@]}}  >> {log}
         
         # check if everything is there
         splids=({params.splids})
