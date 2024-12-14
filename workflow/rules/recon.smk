@@ -159,10 +159,23 @@ rule gapseq_find:
         rxnf=({params.rxnfiles})
         pwyf=({params.pwyfiles})
         trsf=({params.trsfiles})
-        idsall=(`seq 0 $((${#genomes[@]} -1))`)
+        idsall=(`seq 0 $((${{#genomes[@]}} -1))`)
+        idstodo=()
+        
+        for i in "${{!idsall[@]}}"; do
+            if [[ ! -e "${{rxnf[i]}}" || ! -e "${{pwyf[i]}}" || ! -e "${{trsf[i]}}" ]]; then
+                idstodo+=("{{idsall[i]}}")
+            fi
+        done
+        
+        k=${{#idstodo[@]}}
+        n=${{#idsall[@]}}
+        echo "Remaining genomes in group({wildcards.group}): $k / $n"
         
         # finally parallel processing of remaining samples
-        parallel --jobs {threads} gsfind ::: ${idsall[@]}  > {log}
+        nthreads={threads}
+        njobs=$(( nthreads < k ? nthreads : k ))
+        parallel --env njobs --jobs $njobs gsfind ::: ${{idstodo[@]}}  > {log}
         
         # check if everything is there
         splids=({params.splids})
