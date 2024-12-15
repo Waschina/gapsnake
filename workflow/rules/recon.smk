@@ -66,6 +66,10 @@ def get_trs_file_bygroup(wildcards):
 
 # Rules
 
+localrules:
+    gapseq_medium,
+    all
+
 rule all:
     input:
         expand("models/{sample}/{sample}.RDS", sample=SAMPLES),
