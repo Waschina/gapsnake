@@ -1,22 +1,16 @@
 #!/bin/bash
 
-version=0.2.0
+version=0.1.1
 
 
 curdir=$(pwd)
 path=$(readlink -f "$0")
 dir=$(dirname "$path")
 
-gapseq_path=$(which gapseq)
-if [ -z "$gapseq_path" ]; then
-    echo "gapseq executable not found in PATH."
-    exit 1
-fi
-gapseq_dir=$(dirname "$gapseq_path")
-
 usage()
 {
     echo "TODO: Write usage info!"
+
 }
 
 
@@ -26,11 +20,10 @@ if   [ "$1" == "test" ]; then
 elif   [ "$1" == "init" ]; then
     cp $dir/config/config.yaml $curdir/config.yaml
     Rscript $dir/workflow/scripts/init_sample_table.R $2
-    sed -i "s|<gapseq_dir>|$gapseq_dir|g" "$curdir/config.yaml"
-    
+
 elif   [ "$1" == "recon" ]; then
     shift
-    snakemake -s $dir/workflow/rules/recon.smk "$@" --cores 12 --use-conda --rerun-triggers mtime --scheduler greedy --rerun-incomplete
+    snakemake -s $dir/workflow/rules/recon.smk "$@" --cores 16 --use-conda --rerun-triggers mtime --scheduler greedy --rerun-incomplete
     
 else
     usage

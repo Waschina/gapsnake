@@ -20,8 +20,7 @@ genomes <- dir(args[1], pattern = valid_extensions, recursive = TRUE)
 dt <- data.table(sample = basename(gsub(valid_extensions,"", genomes)),
                  genome_file = paste0(args[1],"/",genomes),
                  taxonomy = "auto",
-                 biomass = "auto",
-                 translation_table = 11)
+                 biomass = "auto")
 dt[, medium := paste0("models/",sample,"/",sample,"-medium.csv")]
 
 if(any(duplicated(dt$sample)))
