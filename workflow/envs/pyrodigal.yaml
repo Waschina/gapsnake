@@ -1,9 +1,0 @@
-channels:
-  - conda-forge
-  - bioconda
-  - defaults
-dependencies:
-  - pyrodigal>=3.0.0
-  - biopython
-  - xopen
-
