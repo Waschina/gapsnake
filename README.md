@@ -6,7 +6,7 @@
 
 ## Prerequisites
 
-- you will need to have *gapseq* and its dependencies installed. Also, make sure that you have `gapseq` in your PATH variable.
+- you will need conda
 
 ## Installation
 
@@ -43,7 +43,7 @@ export PATH="${PATH}:/path/to/gapsnake/"
 
 # Initialize gapsnake run
 gapsnake init genomes/ # or instead of "genomes/" any path the place where your genomes are
-
+gapsnake recon
 
 ```
 

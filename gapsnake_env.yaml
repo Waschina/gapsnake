@@ -6,5 +6,33 @@ dependencies:
   - snakemake-minimal >= 7.18.1
   - cookiecutter
   - pandas
-  - mamba
+  - bash
+  - r
+  - gawk
+  - sed
+  - grep
+  - bc
+  - git
+  - coreutils
+  - wget
+  - openssl
+  - glpk
+  - hmmer
+  - blast
+  - bioconda::diamond >=2.1.9
+  - bioconda::mmseqs2
+  - pyrodigal
+  - bioconda::libsbml 
+  - r-data.table
+  - r-stringr
+  - r-stringi
+  - r-getopt
+  - r-r.utils
+  - r-cobrar >=0.1.2
+  - r-biocmanager
+  - bioconductor-biostrings
+  - r-jsonlite
+  - r-renv
+  - r-rcurl
+  - r-httr
 

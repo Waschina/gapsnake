@@ -1,25 +1,17 @@
-
-#---------------------------------#
-# Gene prediction (via pyrodigal) #
-#---------------------------------#
-translate_cds: False
-translate_mem: 2 # Gb
-translate_time: 1 # hours
+#--------------------------#
+# Central parameters       #
+#--------------------------#
+aligner: diamond # blast / diamond / mmseqs2
+gapseq_repo: https://github.com/jotech/gapseq.git
+gapseq_branch: batch_alignment_tests
 
 #--------------------------#
 # Parameters "gapseq find" #
 #--------------------------#
-find_threads: 2
-find_mem: 2 # Gb
-find_time: 10 # hours
+find_threads: 6
+find_mem: 12 # Gb
+find_time: 1 # hours
 find_b: 200 # bitscore cutoff
-
-#------------------------------------#
-# Parameters "gapseq find-transport" #
-#------------------------------------#
-transport_threads: 1
-transport_mem: 2 # Gb
-transport_time: 1 # hours
 
 #---------------------------#
 # Parameter "gapseq draft"  #

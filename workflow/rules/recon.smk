@@ -5,14 +5,10 @@ configfile: "config.yaml"
 sampleTable = pd.read_csv("samples.tsv", index_col="sample", sep="\t")
 SAMPLES = sampleTable.index.values
 
-def get_genome_nucl(wildcards):
-    return sampleTable.at[wildcards.sample, 'genome_file']
+
 
 def get_genome(wildcards):
-    if config.get("translate_cds", 1):
-        return 'genomes_prot/'+wildcards.sample+'.faa.gz'
-    else:
-        return get_genome_nucl(wildcards)
+    return sampleTable.at[wildcards.sample, 'genome_file']
 
 def get_taxonomy(wildcards):
     return sampleTable.at[wildcards.sample, 'taxonomy']
@@ -26,6 +22,7 @@ def get_medium(wildcards):
 
 localrules:
     gapseq_medium,
+    install_gapseq,
     all
 
 
@@ -36,30 +33,40 @@ rule all:
         touch("finished_recon")
 
 
-rule pyrodigal:
-    input:
-        genome=get_genome_nucl
+rule install_gapseq:
     output:
-        prot="genomes_prot/{sample}.faa.gz"
+        testlog="gapseq_test.txt",
+        gapseq_bin="gapseq/gapseq"
+    params:
+        repo=config.get("gapseq_repo", 1),
+        branch=config.get("gapseq_branch", 1)
     threads: 1
-    resources:
-        mem_mb=config.get("translate_mem", 1) * 1000,
-        time=config.get("translate_time", 1)
-    conda:
-        "../envs/pyrodigal.yaml"
-    script:
-        "../scripts/pyrodigal_predict.py"
+    log:
+        "logs/install_gapseq.log"
+    shell:
+        """
+        git clone -b {params.branch} {params.repo} > {log}
+        cd gapseq
+        src/./update_sequences.sh Bacteria >> ../{log}
+        src/./update_sequences.sh Archaea >> ../{log}
+        ./gapseq find -p all -t Bacteria -x toy/myb71.faa.gz >> ../{log}
+        ./gapseq find -p all -t Archaea -x toy/myb71.faa.gz >> ../{log}
+        ./gapseq test > ../{output.testlog}
+        """
 
 
 rule gapseq_find:
     input:
-        get_genome
+        genome=get_genome,
+        testlog=rules.install_gapseq.output.testlog
     params:
         b=config.get("find_b", 1),
-        taxonomy=get_taxonomy
+        taxonomy=get_taxonomy,
+        aligner=config.get("aligner", 1)
     output:
         rxn="models/{sample}/{sample}-all-Reactions.tbl.gz",
-        pwy="models/{sample}/{sample}-all-Pathways.tbl.gz"
+        pwy="models/{sample}/{sample}-all-Pathways.tbl.gz",
+        trsp="models/{sample}/{sample}-Transporter.tbl.gz"
     threads: config.get("find_threads", 1)
     resources:
         mem_mb=config.get("find_mem", 1) * 1000,
@@ -68,34 +75,22 @@ rule gapseq_find:
         "logs/find/{sample}.log"
     shell:
         """
-        gapseq find -p all -b {params.b} -t {params.taxonomy} -m {params.taxonomy} -K {threads} -v 0 -O -f models/{wildcards.sample} {input} > {log}
+        # Reactions / Pathways
+        gapseq/./gapseq find -p all -b {params.b} -t {params.taxonomy} -m {params.taxonomy} -K {threads} -O -A {params.aligner} -f models/{wildcards.sample} {input.genome} > {log}
         gzip -f models/{wildcards.sample}/{wildcards.sample}-all-Reactions.tbl
         gzip -f models/{wildcards.sample}/{wildcards.sample}-all-Pathways.tbl
-        """
         
-rule gapseq_find_transport:
-    input:
-        get_genome
-    output:
-        "models/{sample}/{sample}-Transporter.tbl.gz"
-    threads: config.get("transport_threads", 1)
-    resources:
-        mem_mb=config.get("transport_mem", 1) * 1000,
-        time=config.get("transport_time", 1)
-    log:
-        "logs/transport/{sample}.log"
-    shell:
-        """
-        gapseq find-transport -b 200 -K {threads} -v 0 -f models/{wildcards.sample} {input} > {log}
+        # Transporters
+        gapseq/./gapseq find-transport -b {params.b} -K {threads} -A {params.aligner} -f models/{wildcards.sample} {input.genome} >> {log}
         gzip -f models/{wildcards.sample}/{wildcards.sample}-Transporter.tbl
         """
+
         
 rule gapseq_draft:
     input:
         rxn="models/{sample}/{sample}-all-Reactions.tbl.gz",
         pwy="models/{sample}/{sample}-all-Pathways.tbl.gz",
-        trsp="models/{sample}/{sample}-Transporter.tbl.gz",
-        genome=get_genome,
+        trsp="models/{sample}/{sample}-Transporter.tbl.gz"
     params:
         biomass=get_biomass,
         u=config.get("draft_u", 1),
@@ -113,7 +108,7 @@ rule gapseq_draft:
         "logs/draft/{sample}.log"
     shell:
         """
-        gapseq draft -r {input.rxn} -t {input.trsp} -b {params.biomass} -c {input.genome} -p {input.pwy} -u {params.u} -l {params.l} -f models/{wildcards.sample} > {log}
+        gapseq/./gapseq draft -r {input.rxn} -t {input.trsp} -b {params.biomass} -p {input.pwy} -u {params.u} -l {params.l} -f models/{wildcards.sample} > {log}
         gzip -f models/{wildcards.sample}/{wildcards.sample}-draft.xml
         """
         
@@ -131,9 +126,9 @@ rule gapseq_medium:
         """
         par_c={params.c}
         if [ -n "$par_c" ]; then
-            gapseq medium -m {input.model} -p {input.pwy} -c {params.c} -f models/{wildcards.sample} > {log}
+            gapseq/./gapseq medium -m {input.model} -p {input.pwy} -c {params.c} -f models/{wildcards.sample} > {log}
         else
-            gapseq medium -m {input.model} -p {input.pwy} -f models/{wildcards.sample} > {log}
+            gapseq/./gapseq medium -m {input.model} -p {input.pwy} -f models/{wildcards.sample} > {log}
         fi
         """
         
@@ -158,9 +153,9 @@ rule gapseq_fill:
     shell:
         """
         if grep -q cpd11640 "{input.medium}"; then
-            gapseq fill -m {input.draft} -n {input.medium} -c {input.rxnWeights} -g {input.rxnXgenes} -b {params.b} -e highH2 -f models/{wildcards.sample} -k {params.mingr} > {log}
+            gapseq/./gapseq fill -m {input.draft} -n {input.medium} -c {input.rxnWeights} -g {input.rxnXgenes} -b {params.b} -e highH2 -f models/{wildcards.sample} -k {params.mingr} > {log}
         else
-             gapseq fill -m {input.draft} -n {input.medium} -c {input.rxnWeights} -g {input.rxnXgenes} -b {params.b} -f models/{wildcards.sample} -k {params.mingr} > {log}
+             gapseq/./gapseq fill -m {input.draft} -n {input.medium} -c {input.rxnWeights} -g {input.rxnXgenes} -b {params.b} -f models/{wildcards.sample} -k {params.mingr} > {log}
         fi
         
         gzip -f models/{wildcards.sample}/{wildcards.sample}.xml
