@@ -70,7 +70,7 @@ rule gapseq_find:
     threads: config.get("find_threads", 1)
     resources:
         mem_mb=config.get("find_mem", 1) * 1000,
-        time=config.get("find_time", 1)
+        runtime=config.get("find_time", 1)
     log:
         "logs/find/{sample}.log"
     shell:
@@ -103,7 +103,7 @@ rule gapseq_draft:
     threads: config.get("draft_threads", 1)
     resources:
         mem_mb=config.get("draft_mem", 1) * 1000,
-        time=config.get("draft_time", 1)
+        runtime=config.get("draft_time", 1)
     log:
         "logs/draft/{sample}.log"
     shell:
@@ -147,7 +147,7 @@ rule gapseq_fill:
     threads: config.get("fill_threads", 1)
     resources:
         mem_mb=config.get("fill_mem", 1) * 1000,
-        time=config.get("fill_time", 1)
+        runtime=config.get("fill_time", 1)
     log:
         "logs/fill/{sample}.log"
     shell:

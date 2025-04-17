@@ -10,7 +10,7 @@ gapseq_branch: batch_alignment_tests
 #--------------------------#
 find_threads: 6
 find_mem: 12 # Gb
-find_time: 1 # hours
+find_time: 30m # 'm' for minutes
 find_b: 200 # bitscore cutoff
 
 #---------------------------#
@@ -18,7 +18,7 @@ find_b: 200 # bitscore cutoff
 #---------------------------#
 draft_threads: 1
 draft_mem: 3 # Gb
-draft_time: 1 # hours
+draft_time: 10m # 'm' for minutes
 draft_u: 200
 draft_l: 100
 
@@ -33,6 +33,6 @@ medium_c: "cpd00007:0"
 fill_threads: 1
 fill_mem: 3 # Gb
 fill_b: 100
-fill_time: 1 # hours
+fill_time: 45m # 'm' for minutes
 fill_mingr: 0.001
 
