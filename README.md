@@ -23,20 +23,18 @@ ln -sr `pwd`/gapsnake ${CONDA_PREFIX}/bin/
 
 ##### Setting up cluster execution
 
-Note: Until now, only tested with the SLURM scheduler on CAU's caucluster.
+Cluster execution of snakemake workflows is facilitated via [snakemake executor plugins](https://snakemake.github.io/snakemake-plugin-catalog/index.html). To install the plugin for SLURM, you can run:
 
 ```sh
 conda activate gapsnake
-cookiecutter --output-dir ~/.config/snakemake https://github.com/metagenome-atlas/clusterprofile.git
+pip install snakemake-executor-plugin-slurm
 ```
-
-
 
 ## Quick start
 
-Local machine
+##### Local machine
 
-```R
+```sh
 # The Setup
 cd /path/to/project/directory # Usually one dir up from where your genomes are
 conda activate gapsnake
@@ -48,9 +46,7 @@ gapsnake recon --cores 16 --keep-going # Set to the maximum number of cores you 
 
 ```
 
-
-
-Cluster execution
+##### Cluster execution 
 
 ```sh
 # The Setup
@@ -60,6 +56,7 @@ conda activate gapsnake
 
 # Initialize gapsnake run
 gapsnake init genomes/ # or instead of "genomes/" any path the place where your genomes are
-gapsnake recon --profile cluster --keep-going # Set to the maximum number of cores you want to use
+gapsnake recon --executor slurm --keep-going # Set to the maximum number of cores you want to use
 ```
 
+Note that the example above is for SLURM job scheduling systems. In case you want to (or have to) use a different scheduling system, please read the [Snakemake Plugin Catalog](https://snakemake.github.io/snakemake-plugin-catalog/index.html). 

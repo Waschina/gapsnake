@@ -3,8 +3,8 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - snakemake-minimal >= 7.18.1
-  - cookiecutter
+  - snakemake-minimal >= 9.3.0
+  - pip
   - pandas
   - bash
   - r
