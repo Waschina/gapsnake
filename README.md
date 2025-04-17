@@ -18,6 +18,7 @@ cd gapsnake
 # Create and activate a conda environment "gapsnake"
 conda env create -n gapsnake --file gapsnake_env.yaml
 conda activate gapsnake
+ln -sr `pwd`/gapsnake ${CONDA_PREFIX}/bin/
 ```
 
 ##### Setting up cluster execution
@@ -39,11 +40,11 @@ Local machine
 # The Setup
 cd /path/to/project/directory # Usually one dir up from where your genomes are
 conda activate gapsnake
-export PATH="${PATH}:/path/to/gapsnake/"
+
 
 # Initialize gapsnake run
 gapsnake init genomes/ # or instead of "genomes/" any path the place where your genomes are
-gapsnake recon
+gapsnake recon --cores 16 --keep-going # Set to the maximum number of cores you want to use
 
 ```
 
@@ -52,6 +53,13 @@ gapsnake recon
 Cluster execution
 
 ```sh
-gapsnake recon --profile cluster
+# The Setup
+cd /path/to/project/directory # Usually one dir up from where your genomes are
+conda activate gapsnake
+
+
+# Initialize gapsnake run
+gapsnake init genomes/ # or instead of "genomes/" any path the place where your genomes are
+gapsnake recon --profile cluster --keep-going # Set to the maximum number of cores you want to use
 ```
 
