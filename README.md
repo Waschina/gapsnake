@@ -18,6 +18,7 @@ cd gapsnake
 # Create and activate a conda environment "gapsnake"
 conda env create -n gapsnake --file gapsnake_env.yaml
 conda activate gapsnake
+ln -sr `pwd`/gapsnake ${CONDA_PREFIX}/bin/
 ```
 
 ##### Setting up cluster execution
