@@ -4,10 +4,6 @@
 
 
 
-## Prerequisites
-
-- you will need conda
-
 ## Installation
 
 ```sh
@@ -29,6 +25,21 @@ Cluster execution of snakemake workflows is facilitated via [snakemake executor 
 conda activate gapsnake
 pip install snakemake-executor-plugin-slurm
 ```
+
+##### CPLEX support
+
+This gapsnake workflow installs gapseq with GLPK as the default LP solver by default. If you have IBM’s ILOG CPLEX installed on your system and want to use it as LP solver instead of GLPK, you can follow the following commands:
+
+First, activate the conda environment if it is not already active:
+```sh
+conda activate gapsnake
+```
+Next, start R and run the commands:
+```R
+install.packages("remotes")
+remotes::install_github("Waschina/cobrarCPLEX", configure.args="--with-cplex-dir=/path/to/cplex")
+```
+Make sure to replace `/path/to/cplex` with the path to your IBM ILOG CPLEX installation (e.g., `/opt/IBM/ILOG/CPLEX_Studio2211/cplex`).
 
 ## Quick start
 
