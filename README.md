@@ -19,7 +19,9 @@ ln -sr `pwd`/gapsnake ${CONDA_PREFIX}/bin/
 
 ##### Setting up cluster execution
 
-Cluster execution of snakemake workflows is facilitated via [snakemake executor plugins](https://snakemake.github.io/snakemake-plugin-catalog/index.html). To install the plugin for SLURM, you can run:
+Cluster execution of snakemake workflows is facilitated via [snakemake executor plugins](https://snakemake.github.io/snakemake-plugin-catalog/index.html).
+
+For instance: To install the plugin for **SLURM**, you can run:
 
 ```sh
 conda activate gapsnake
@@ -33,11 +35,7 @@ This gapsnake workflow installs gapseq with GLPK as the default LP solver by def
 First, activate the conda environment if it is not already active:
 ```sh
 conda activate gapsnake
-```
-Next, start R and run the commands:
-```R
-install.packages("remotes")
-remotes::install_github("Waschina/cobrarCPLEX", configure.args="--with-cplex-dir=/path/to/cplex")
+Rscript -e 'remotes::install_github("Waschina/cobrarCPLEX", configure.args="--with-cplex-dir=/path/to/cplex")'
 ```
 Make sure to replace `/path/to/cplex` with the path to your IBM ILOG CPLEX installation (e.g., `/opt/IBM/ILOG/CPLEX_Studio2211/cplex`).
 

@@ -97,8 +97,6 @@ rule gapseq_draft:
         l=config.get("draft_l", 1)
     output:
         draft="models/{sample}/{sample}-draft.RDS",
-        rxnWeights="models/{sample}/{sample}-rxnWeights.RDS",
-        rxnXgenes="models/{sample}/{sample}-rxnXgenes.RDS",
         xml="models/{sample}/{sample}-draft.xml.gz"
     threads: config.get("draft_threads", 1)
     resources:
@@ -135,9 +133,7 @@ rule gapseq_medium:
 rule gapseq_fill:
     input:
         draft="models/{sample}/{sample}-draft.RDS",
-        medium=get_medium,
-        rxnWeights="models/{sample}/{sample}-rxnWeights.RDS",
-        rxnXgenes="models/{sample}/{sample}-rxnXgenes.RDS"
+        medium=get_medium
     params:
         b=config.get("fill_b", 1),
         mingr=config.get("fill_mingr", 1)
@@ -153,9 +149,9 @@ rule gapseq_fill:
     shell:
         """
         if grep -q cpd11640 "{input.medium}"; then
-            gapseq/./gapseq fill -m {input.draft} -n {input.medium} -c {input.rxnWeights} -g {input.rxnXgenes} -b {params.b} -e highH2 -f models/{wildcards.sample} -k {params.mingr} > {log}
+            gapseq/./gapseq fill -m {input.draft} -n {input.medium} -b {params.b} -e highH2 -f models/{wildcards.sample} -k {params.mingr} > {log}
         else
-             gapseq/./gapseq fill -m {input.draft} -n {input.medium} -c {input.rxnWeights} -g {input.rxnXgenes} -b {params.b} -f models/{wildcards.sample} -k {params.mingr} > {log}
+             gapseq/./gapseq fill -m {input.draft} -n {input.medium} -b {params.b} -f models/{wildcards.sample} -k {params.mingr} > {log}
         fi
         
         gzip -f models/{wildcards.sample}/{wildcards.sample}.xml
