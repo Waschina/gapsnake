@@ -139,7 +139,9 @@ rule gapseq_fill:
         mingr=config.get("fill_mingr", 1)
     output:
         model="models/{sample}/{sample}.RDS",
-        xml="models/{sample}/{sample}.xml.gz"
+        xml="models/{sample}/{sample}.xml.gz",
+        cs="models/{sample}/{sample}-cs.tbl",
+        ferm="models/{sample}/{sample}-ferm.tbl"
     threads: config.get("fill_threads", 1)
     resources:
         mem_mb=config.get("fill_mem", 1) * 1000,
@@ -149,9 +151,9 @@ rule gapseq_fill:
     shell:
         """
         if grep -q cpd11640 "{input.medium}"; then
-            gapseq/./gapseq fill -m {input.draft} -n {input.medium} -b {params.b} -e highH2 -f models/{wildcards.sample} -k {params.mingr} > {log}
+            gapseq/./gapseq fill -m {input.draft} -n {input.medium} -b {params.b} -e highH2 -f models/{wildcards.sample} -k {params.mingr} -w > {log}
         else
-             gapseq/./gapseq fill -m {input.draft} -n {input.medium} -b {params.b} -f models/{wildcards.sample} -k {params.mingr} > {log}
+             gapseq/./gapseq fill -m {input.draft} -n {input.medium} -b {params.b} -f models/{wildcards.sample} -k {params.mingr} -w > {log}
         fi
         
         gzip -f models/{wildcards.sample}/{wildcards.sample}.xml
