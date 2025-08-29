@@ -51,8 +51,8 @@ rule install_gapseq:
         cd gapseq
         ./gapseq update-sequences -t Bacteria -D {params.seqDB} -Z {params.seqDBversion} >> ../{log}
         ./gapseq update-sequences -t Archaea -D {params.seqDB} -Z {params.seqDBversion} >> ../{log}
-        ./gapseq find -p all -t Bacteria -x toy/myb71.faa.gz >> ../{log}
-        ./gapseq find -p all -t Archaea -x toy/myb71.faa.gz >> ../{log}
+        ./gapseq find -p all -t Bacteria -x -D {params.seqDB} -Z {params.seqDBversion} toy/myb71.faa.gz >> ../{log}
+        ./gapseq find -p all -t Archaea -x -D {params.seqDB} -Z {params.seqDBversion} toy/myb71.faa.gz >> ../{log}
         ./gapseq test > ../{output.testlog}
         """
 
