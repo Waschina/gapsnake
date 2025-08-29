@@ -39,7 +39,9 @@ rule install_gapseq:
         gapseq_bin="gapseq/gapseq"
     params:
         repo=config.get("gapseq_repo", 1),
-        branch=config.get("gapseq_branch", 1)
+        branch=config.get("gapseq_branch", 1),
+        seqDB=config.get("gapseq_seqDB", 1),
+        seqDBversion=config.get("gapseq_seqDBversion", 1)
     threads: 1
     log:
         "logs/install_gapseq.log"
@@ -47,8 +49,8 @@ rule install_gapseq:
         """
         git clone -b {params.branch} {params.repo} > {log}
         cd gapseq
-        src/./update_sequences.sh Bacteria >> ../{log}
-        src/./update_sequences.sh Archaea >> ../{log}
+        ./gapseq update-sequences -t Bacteria -D {params.seqDB} -Z {params.seqDBversion} >> ../{log}
+        ./gapseq update-sequences -t Archaea -D {params.seqDB} -Z {params.seqDBversion} >> ../{log}
         ./gapseq find -p all -t Bacteria -x toy/myb71.faa.gz >> ../{log}
         ./gapseq find -p all -t Archaea -x toy/myb71.faa.gz >> ../{log}
         ./gapseq test > ../{output.testlog}
@@ -62,7 +64,9 @@ rule gapseq_find:
     params:
         b=config.get("find_b", 1),
         taxonomy=get_taxonomy,
-        aligner=config.get("aligner", 1)
+        aligner=config.get("aligner", 1),
+        seqDB=config.get("gapseq_seqDB", 1),
+        seqDBversion=config.get("gapseq_seqDBversion", 1)
     output:
         rxn="models/{sample}/{sample}-all-Reactions.tbl.gz",
         pwy="models/{sample}/{sample}-all-Pathways.tbl.gz",
@@ -76,7 +80,7 @@ rule gapseq_find:
     shell:
         """
         # Reactions / Pathways
-        gapseq/./gapseq find -p all -b {params.b} -t {params.taxonomy} -m {params.taxonomy} -K {threads} -O -A {params.aligner} -f models/{wildcards.sample} {input.genome} > {log}
+        gapseq/./gapseq find -p all -b {params.b} -t {params.taxonomy} -m {params.taxonomy} -K {threads} -O -A {params.aligner} -f models/{wildcards.sample} -D {params.seqDB} -Z {params.seqDBversion} {input.genome} > {log}
         gzip -f models/{wildcards.sample}/{wildcards.sample}-all-Reactions.tbl
         gzip -f models/{wildcards.sample}/{wildcards.sample}-all-Pathways.tbl
         

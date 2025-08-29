@@ -4,11 +4,13 @@
 aligner: diamond # blast / diamond / mmseqs2
 gapseq_repo: https://github.com/jotech/gapseq.git
 gapseq_branch: batch_alignment_tests
+gapseq_seqDB: dat/seq
+gapseq_seqDBversion: latest # 'latest' or one of the zenodo record IDs (https://doi.org/10.5281/zenodo.10047603)
 
 #--------------------------#
 # Parameters "gapseq find" #
 #--------------------------#
-find_threads: 6
+find_threads: 4
 find_mem: 12 # Gb
 find_time: 30m # 'm' for minutes
 find_b: 200 # bitscore cutoff
