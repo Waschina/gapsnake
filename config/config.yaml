@@ -4,7 +4,7 @@
 aligner: diamond # blast / diamond / mmseqs2
 gapseq_repo: https://github.com/jotech/gapseq.git
 gapseq_branch: batch_alignment_tests
-gapseq_seqDB: dat/seq
+gapseq_seqDB: $curdir/gapseq/dat/seq
 gapseq_seqDBversion: latest # 'latest' or one of the zenodo record IDs (https://doi.org/10.5281/zenodo.10047603)
 
 #--------------------------#
