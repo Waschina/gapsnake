@@ -51,8 +51,8 @@ rule install_gapseq:
         cd gapseq
         ./gapseq update-sequences -t Bacteria -D {params.seqDB} -Z {params.seqDBversion} >> ../{log}
         ./gapseq update-sequences -t Archaea -D {params.seqDB} -Z {params.seqDBversion} >> ../{log}
-        ./gapseq find -p all -t Bacteria -x -D {params.seqDB} -Z {params.seqDBversion} toy/myb71.faa.gz >> ../{log}
-        ./gapseq find -p all -t Archaea -x -D {params.seqDB} -Z {params.seqDBversion} toy/myb71.faa.gz >> ../{log}
+        ./gapseq find -p all -t Bacteria -x -D {params.seqDB} toy/myb71.faa.gz >> ../{log}
+        ./gapseq find -p all -t Archaea -x -D {params.seqDB} toy/myb71.faa.gz >> ../{log}
         ./gapseq test > ../{output.testlog}
         """
 
@@ -80,7 +80,7 @@ rule gapseq_find:
     shell:
         """
         # Reactions / Pathways
-        gapseq/./gapseq find -p all -b {params.b} -t {params.taxonomy} -m {params.taxonomy} -K {threads} -O -A {params.aligner} -f models/{wildcards.sample} -D {params.seqDB} -Z {params.seqDBversion} {input.genome} > {log}
+        gapseq/./gapseq find -p all -b {params.b} -t {params.taxonomy} -m {params.taxonomy} -K {threads} -O -A {params.aligner} -f models/{wildcards.sample} -D {params.seqDB} {input.genome} > {log}
         gzip -f models/{wildcards.sample}/{wildcards.sample}-all-Reactions.tbl
         gzip -f models/{wildcards.sample}/{wildcards.sample}-all-Pathways.tbl
         
