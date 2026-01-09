@@ -47,7 +47,7 @@ rule install_gapseq:
         "logs/install_gapseq.log"
     shell:
         """
-        git clone -b {params.branch} {params.repo} > {log}
+        git clone --depth 1 -b {params.branch} {params.repo} > {log}
         cd gapseq
         ./gapseq update-sequences -t Bacteria -D {params.seqDB} -Z {params.seqDBversion} >> ../{log}
         ./gapseq update-sequences -t Archaea -D {params.seqDB} -Z {params.seqDBversion} >> ../{log}
