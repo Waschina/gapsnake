@@ -19,7 +19,6 @@ dependencies:
   - hmmer
   - blast
   - diamond >=2.1.9
-  - mmseqs2
   - pyrodigal
   - r-data.table
   - r-stringr
